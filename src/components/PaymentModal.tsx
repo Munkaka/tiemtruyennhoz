@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect } from 'react';
-// Fixed PaymentModal
 import { X, CreditCard, Wallet, Lock, Copy, Check } from 'lucide-react';
 import { api } from '../api/client';
 
@@ -8,7 +6,7 @@ interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   type: 'deposit' | 'withdraw' | 'unlock';
-  amount?: number; // For unlock
+  amount?: number;
   onSuccess?: () => void;
 }
 
