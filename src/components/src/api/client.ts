@@ -1,5 +1,5 @@
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787';
+const BASE_URL = import.meta.env.VITE_API_URL || 'tiemtruyennhoz.muncute12121231-503.workers.dev';
 
 export const api = {
   async get(endpoint: string) {
