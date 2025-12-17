@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Eye, Star } from 'lucide-react';
 import { Story } from '../data/mockData';
