@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { MOCK_STORIES } from '../data/mockData';
 import StoryCard from '../components/StoryCard';
@@ -7,9 +6,10 @@ import { TrendingUp, Sparkles } from 'lucide-react';
 import { api } from '../api/client';
 
 const Home: React.FC = () => {
-  // Home page with Author Banner
+  // Sử dụng dữ liệu mẫu, KHÔNG gọi API nữa để test
   const [stories, setStories] = useState(MOCK_STORIES);
 
+  /* 
   useEffect(() => {
     api.get('/api/stories').then(data => {
       if (data && Array.isArray(data) && data.length > 0) {
@@ -17,10 +17,11 @@ const Home: React.FC = () => {
       }
     });
   }, []);
+  */
 
   return (
     <div className="space-y-10">
-      {/* Simple Banner / Slider (No Blue Frame) */}
+      {/* Banner */}
       <section className="relative h-64 md:h-80 rounded-2xl overflow-hidden group">
         <img 
           src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&q=80" 
@@ -32,8 +33,6 @@ const Home: React.FC = () => {
           <p className="text-gray-200 text-lg max-w-xl">Thế giới tiên hiệp, huyền huyễn đặc sắc đang chờ bạn khám phá.</p>
         </div>
       </section>
-
-
 
       {/* Trending Section */}
       <section>
