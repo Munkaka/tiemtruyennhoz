@@ -1,4 +1,3 @@
-
 const BASE_URL = import.meta.env.VITE_API_URL || 'https://tiemtruyennhoz.anhthu102726.workers.dev';
 
 export const api = {
@@ -7,7 +6,6 @@ export const api = {
       const res = await fetch(`${BASE_URL}${endpoint}`, {
         headers: {
           'Content-Type': 'application/json',
-          // Add auth headers if needed, usually handled by browser or custom logic
           'X-Encrypted-Yw-ID': localStorage.getItem('yw_user_id') || '',
           'X-Is-Login': localStorage.getItem('yw_is_login') || '0'
         }
@@ -39,8 +37,6 @@ export const api = {
 
   async getUserInfo() {
     try {
-      // In a real app, you might fetch this from your backend or use the platform's user info
-      // For this project, we use the backend's /api/user/me endpoint if available
       const res = await fetch(`${BASE_URL}/api/user/me`, {
         headers: {
           'X-Encrypted-Yw-ID': localStorage.getItem('yw_user_id') || '',
