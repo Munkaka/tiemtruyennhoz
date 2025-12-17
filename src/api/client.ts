@@ -1,4 +1,4 @@
-const BASE_URL = 'https://tiemtruyennhoz.muncute12121231-503.workers.dev';
+const BASE_URL = 'tiemtruyennhoz.anhthu102726.workers.dev';
 
 export const api = {
   async get(endpoint: string) {
