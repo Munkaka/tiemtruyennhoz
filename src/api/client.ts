@@ -12,7 +12,6 @@ export const api = {
       });
       return await res.json();
     } catch (e) {
-      console.error(`API Error GET ${endpoint}`, e);
       return null;
     }
   },
@@ -30,7 +29,6 @@ export const api = {
       });
       return await res.json();
     } catch (e) {
-      console.error(`API Error POST ${endpoint}`, e);
       return null;
     }
   },
