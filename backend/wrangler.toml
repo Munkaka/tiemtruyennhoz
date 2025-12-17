@@ -6,4 +6,4 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "tiem-truyen-nho-db"
-database_id = "332ef127-ab4a-440c-b7ff-494b2d002bdd" # Will be injected by platform
+database_id = "3e98ac5f-46e4-4d21-8e37-fc952e6879d0" # Will be injected by platform
