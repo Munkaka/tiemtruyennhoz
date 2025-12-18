@@ -1,4 +1,5 @@
-// KHÔNG import React nữa
+import React from 'react';
+
 export function App() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-50">
