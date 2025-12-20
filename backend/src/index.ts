@@ -278,9 +278,11 @@ export default {
       const body = await request.json() as any;
       const existing = await env.DB.prepare('SELECT * FROM users WHERE encrypted_yw_id = ?').bind(userId).first();
       if (existing) {
-        await env.DB.prepare('UPDATE users SET display_name = ?, photo_url = ? WHERE encrypted_yw_id = ?').bind(body.display_name, body.photo_url, userId).run();
+        await env.DB.prepare('UPDATE users SET display_name = ?, photo_url = ?, email = ? WHERE encrypted_yw_id = ?')
+          .bind(body.display_name, body.photo_url, body.email || null, userId).run();
       } else {
-        await env.DB.prepare('INSERT INTO users (encrypted_yw_id, display_name, photo_url, role, balance, earnings) VALUES (?, ?, ?, ?, 0, 0)').bind(userId, body.display_name, body.photo_url, 'reader').run();
+        await env.DB.prepare('INSERT INTO users (encrypted_yw_id, display_name, photo_url, email, role, balance, earnings) VALUES (?, ?, ?, ?, ?, 0, 0)')
+          .bind(userId, body.display_name, body.photo_url, body.email || null, 'reader').run();
       }
       const user = await env.DB.prepare('SELECT * FROM users WHERE encrypted_yw_id = ?').bind(userId).first();
       return new Response(JSON.stringify(user), { headers });

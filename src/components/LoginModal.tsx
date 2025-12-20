@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
-import { X, Mail, Lock, User, Chrome } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Mail, Lock, User } from 'lucide-react';
 import { api } from '../api/client';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+}
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: any) => void;
+          renderButton: (element: HTMLElement, config: any) => void;
+          prompt: () => void;
+        };
+      };
+    };
+  }
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
@@ -15,6 +29,66 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     displayName: ''
   });
   const [loading, setLoading] = useState(false);
+  const googleButtonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen && window.google) {
+      initializeGoogleSignIn();
+    }
+  }, [isOpen]);
+
+  const initializeGoogleSignIn = () => {
+    const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    if (!GOOGLE_CLIENT_ID) {
+      console.warn('Google Client ID not found. Please set VITE_GOOGLE_CLIENT_ID in .env file');
+      return;
+    }
+
+    window.google?.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCallback,
+      auto_select: false,
+    });
+
+    if (googleButtonRef.current) {
+      window.google?.accounts.id.renderButton(
+        googleButtonRef.current,
+        {
+          theme: 'outline',
+          size: 'large',
+          width: '100%',
+          text: 'continue_with',
+          locale: 'vi'
+        }
+      );
+    }
+  };
+
+  const handleGoogleCallback = async (response: any) => {
+    setLoading(true);
+    try {
+      const credential = response.credential;
+      const payload = JSON.parse(atob(credential.split('.')[1]));
+
+      const userId = 'google_' + payload.sub;
+
+      localStorage.setItem('yw_user_id', userId);
+      localStorage.setItem('yw_is_login', '1');
+
+      await api.post('/api/sync-user', {
+        display_name: payload.name || payload.email.split('@')[0],
+        photo_url: payload.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(payload.name || 'User')}&background=random`,
+        email: payload.email
+      });
+
+      window.location.reload();
+    } catch (error) {
+      console.error('Google login error:', error);
+      alert('Đăng nhập thất bại. Vui lòng thử lại.');
+      setLoading(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -22,39 +96,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate Login/Register logic for this template
-    // In a real app, you would call api.post('/auth/login', ...)
-    
     setTimeout(() => {
-      // Mock successful login by setting localStorage
-      // The backend uses X-Encrypted-Yw-ID header to identify users
       const mockUserId = 'user_' + Math.random().toString(36).substr(2, 9);
-      
+
       localStorage.setItem('yw_user_id', mockUserId);
       localStorage.setItem('yw_is_login', '1');
-      
-      // Sync user info to backend immediately
+
       api.post('/api/sync-user', {
         display_name: formData.displayName || formData.email.split('@')[0],
-        photo_url: `https://ui-avatars.com/api/?name=${formData.displayName || 'User'}&background=random`
-      }).then(() => {
-        setLoading(false);
-        window.location.reload(); // Reload to update UI state
-      });
-    }, 1000);
-  };
-
-  const handleGoogleLogin = () => {
-    // Mock Google Login
-    setLoading(true);
-    setTimeout(() => {
-      const mockUserId = 'google_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('yw_user_id', mockUserId);
-      localStorage.setItem('yw_is_login', '1');
-      
-      api.post('/api/sync-user', {
-        display_name: 'Google User',
-        photo_url: 'https://ui-avatars.com/api/?name=Google+User&background=random'
+        photo_url: `https://ui-avatars.com/api/?name=${formData.displayName || 'User'}&background=random`,
+        email: formData.email
       }).then(() => {
         setLoading(false);
         window.location.reload();
@@ -66,7 +117,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
         <div className="p-6 relative">
-          <button 
+          <button
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
           >
@@ -80,6 +131,26 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             {isRegister ? 'Tạo tài khoản để đọc và viết truyện' : 'Chào mừng bạn quay trở lại!'}
           </p>
 
+          <div className="mb-6">
+            <div ref={googleButtonRef} className="w-full flex justify-center" />
+            {!import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
+                <p className="text-xs text-yellow-700">
+                  Cần cấu hình Google Client ID để sử dụng đăng nhập Google.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Hoặc đăng nhập bằng email</span>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister && (
               <div className="space-y-1">
@@ -89,7 +160,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                   <input
                     type="text"
                     required
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                     placeholder="Nhập tên hiển thị"
                     value={formData.displayName}
                     onChange={e => setFormData({...formData, displayName: e.target.value})}
@@ -105,7 +176,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 <input
                   type="email"
                   required
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   placeholder="name@example.com"
                   value={formData.email}
                   onChange={e => setFormData({...formData, email: e.target.value})}
@@ -120,7 +191,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 <input
                   type="password"
                   required
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={e => setFormData({...formData, password: e.target.value})}
@@ -131,32 +202,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? 'Đang xử lý...' : (isRegister ? 'Đăng Ký' : 'Đăng Nhập')}
             </button>
           </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Hoặc tiếp tục với</span>
-              </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-1 gap-3">
-              <button 
-                onClick={handleGoogleLogin}
-                className="flex items-center justify-center gap-2 w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-xl transition-colors"
-              >
-                <Chrome size={20} className="text-red-500" />
-                <span>Google</span>
-              </button>
-            </div>
-          </div>
 
           <div className="mt-6 text-center text-sm">
             <span className="text-gray-500">
@@ -164,39 +214,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             </span>
             <button
               onClick={() => setIsRegister(!isRegister)}
-              className="ml-2 font-bold text-indigo-600 hover:text-indigo-500"
+              className="ml-2 font-bold text-blue-600 hover:text-blue-500"
             >
               {isRegister ? 'Đăng nhập ngay' : 'Đăng ký ngay'}
             </button>
-          </div>
-          
-          {/* Admin Login Hint */}
-          <div className="mt-4 pt-4 border-t border-gray-100 text-center">
-             <p className="text-xs text-gray-400 mb-2">Chế độ kiểm thử (Testing Mode):</p>
-             <button 
-               onClick={() => {
-                 // Mock Admin Login
-                 setLoading(true);
-                 setTimeout(() => {
-                   const mockUserId = 'admin_' + Math.random().toString(36).substr(2, 9);
-                   localStorage.setItem('yw_user_id', mockUserId);
-                   localStorage.setItem('yw_is_login', '1');
-                   
-                   // Sync user as admin
-                   api.post('/api/sync-user', {
-                     display_name: 'Admin User',
-                     photo_url: 'https://ui-avatars.com/api/?name=Admin+User&background=000&color=fff'
-                   }).then(() => {
-                     setLoading(false);
-                     alert('Đăng nhập thành công! Bạn đang sử dụng tài khoản Admin giả lập.');
-                     window.location.reload();
-                   });
-                 }, 1000);
-               }}
-               className="text-xs text-indigo-400 hover:text-indigo-600 underline"
-             >
-               Đăng nhập nhanh (Admin)
-             </button>
           </div>
         </div>
       </div>
