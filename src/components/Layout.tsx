@@ -62,8 +62,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Menu size={24} />
             </button>
             <Link to="/" className="flex items-center gap-2">
-              <BookOpen className="text-indigo-600" size={32} />
-              <span className="text-xl font-bold text-gray-800 hidden sm:block">TiệmTruyệnNhỏ</span>
+              <BookOpen className="text-blue-600" size={32} />
+              <span className="text-xl font-bold text-gray-800 hidden sm:block">Tiệm Truyện Nhỏ</span>
             </Link>
           </div>
 
@@ -78,20 +78,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   onBlur={() => setTimeout(() => setIsSearchOpen(false), 200)}
                 />
               )}
-              <button 
+              <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className={`p-2 rounded-full relative group transition-colors ${isSearchOpen ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-gray-100 text-gray-600'}`}
+                className={`p-2 rounded-full relative group transition-colors ${isSearchOpen ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
               >
-                <Search size={24} />
+                <Search size={20} />
               </button>
             </div>
 
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className={`p-2 rounded-full relative group transition-colors ${isNotificationsOpen ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-gray-100 text-gray-600'}`}
+                className={`p-2 rounded-full relative group transition-colors ${isNotificationsOpen ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
               >
-                <Bell size={24} />
+                <Bell size={20} />
                 <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               
@@ -116,13 +116,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <div className="flex items-center gap-3">
                 <div className="hidden md:flex flex-col items-end mr-2">
                   <span className="text-sm font-bold text-gray-700">{user.display_name || 'User'}</span>
-                  <span className="text-xs text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full">
+                  <span className="text-xs text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full">
                     {user.balance?.toLocaleString() || 0} Xu
                   </span>
                 </div>
                 <Link to="/profile" className="flex items-center gap-2 hover:bg-gray-50 p-1 pr-3 rounded-full border border-transparent hover:border-gray-200 transition-all">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 overflow-hidden">
-                    {user.photo_url ? <img src={user.photo_url} alt="Avatar" /> : <User className="p-1 text-indigo-600" />}
+                  <div className="w-8 h-8 rounded-full bg-blue-100 overflow-hidden">
+                    {user.photo_url ? <img src={user.photo_url} alt="Avatar" className="w-full h-full object-cover" /> : <User className="p-1 text-blue-600" />}
                   </div>
                 </Link>
               </div>
@@ -152,10 +152,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         {/* Sidebar */}
         <aside className={`
-          fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white lg:bg-transparent shadow-xl lg:shadow-none transform transition-transform duration-300 ease-in-out
+          fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-xl lg:shadow-none transform transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
-          <div className="h-full flex flex-col p-4 lg:p-0">
+          <div className="h-full flex flex-col p-4">
             <div className="flex justify-between items-center lg:hidden mb-6">
               <span className="text-xl font-bold text-gray-800">Menu</span>
               <button onClick={toggleSidebar} className="p-2 hover:bg-gray-100 rounded-full">
@@ -163,7 +163,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </button>
             </div>
 
-            <nav className="space-y-2">
+            <nav className="space-y-1">
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
@@ -171,10 +171,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                      isActive 
-                        ? 'bg-indigo-600 text-white shadow-md' 
-                        : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-gray-700 hover:bg-gray-100'
                     }`}
                     onClick={() => setIsSidebarOpen(false)}
                   >
@@ -183,13 +183,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </Link>
                 );
               })}
-              
+
               <div className="my-4 border-t border-gray-200 lg:hidden"></div>
-              
+
               {!user && (
-                <button 
+                <button
                   onClick={() => { setIsSidebarOpen(false); setIsLoginModalOpen(true); }}
-                  className="flex lg:hidden items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-100 w-full"
+                  className="flex lg:hidden items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 w-full"
                 >
                   <LogIn size={20} />
                   <span className="font-medium">Đăng nhập / Đăng ký</span>
@@ -197,11 +197,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               )}
             </nav>
 
-            {/* Admin Link (Mock) */}
-            <div className="mt-auto pt-6">
-               <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl p-4 text-white shadow-lg">
+            {/* Author Promotion Card */}
+            <div className="mt-auto pt-6 hidden lg:block">
+               <div className="bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl p-4 text-white shadow-md">
                   <h3 className="font-bold text-sm mb-1">Trở thành Tác giả?</h3>
-                  <p className="text-xs opacity-90 mb-3">Đăng tải truyện của bạn ngay hôm nay.</p>
+                  <p className="text-xs opacity-90 mb-3">Đăng tải truyện và kiếm thu nhập.</p>
                   <Link to="/profile" className="block text-center w-full bg-white/20 hover:bg-white/30 py-2 rounded-lg text-xs font-bold transition-colors">
                     Gửi yêu cầu
                   </Link>

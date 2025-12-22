@@ -26,7 +26,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
   const authorName = story.author || 'Tác giả';
 
   return (
-    <Link to={`/story/${story.id}`} className="group bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full border border-gray-100 hover:border-indigo-100">
+    <Link to={`/story/${story.id}`} className="group bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full border border-gray-100 hover:border-blue-100">
       <div className="relative aspect-[2/3] overflow-hidden">
         <img 
           src={story.cover || 'https://via.placeholder.com/300x450'} 
@@ -38,7 +38,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
           <span>{story.rating || 0}</span>
         </div>
         <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-           <button className="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-lg">
+           <button className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-lg">
              Đọc Ngay
            </button>
         </div>
@@ -47,13 +47,13 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
       <div className="p-4 flex flex-col flex-1">
         <div className="flex flex-wrap gap-1 mb-2">
           {genres.slice(0, 2).map((genre) => (
-            <span key={genre} className="text-[10px] uppercase tracking-wider font-semibold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">
+            <span key={genre} className="text-[10px] uppercase tracking-wider font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
               {genre}
             </span>
           ))}
         </div>
         
-        <h3 className="font-bold text-gray-800 mb-1 line-clamp-1 group-hover:text-indigo-600 transition-colors" title={story.title}>
+        <h3 className="font-bold text-gray-800 mb-1 line-clamp-1 group-hover:text-blue-600 transition-colors" title={story.title}>
           {story.title}
         </h3>
         
